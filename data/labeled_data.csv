@@ -1,0 +1,151 @@
+Response ID,Application,End-User Comment,Technical,Performance,UX,Data/Security
+R-1000,SharePoint,Document management is solid. Version history has saved us from overwritten files many times.,,,X,X
+R-1001,Concur Expense,Works for standard expenses but international travel reimbursement is confusing.,,,X,
+R-1002,Workday HCM,Adequate for benefits enrollment but the comparison tools could be more robust.,,,X,
+R-1003,Tableau,Great for visualization but data prep capabilities are limited compared to dedicated ETL tools.,,,,X
+R-1004,SharePoint,Works for our needs but building custom pages requires more effort than it should.,,,X,
+R-1005,Power BI,Affordable alternative to Tableau with excellent integration into our Microsoft ecosystem.,X,,,
+R-1006,ServiceNow,Knowledge base integration helps agents resolve issues faster with suggested articles.,X,,X,
+R-1007,SAP ERP,Financial reporting is rock solid. Month-end close is much smoother now.,,,X,X
+R-1008,Concur Expense,Slow performance during peak submission periods at month-end. Very frustrating.,,X,X,
+R-1009,Zoom,Virtual backgrounds and touch-up features make working from home more professional.,,,X,
+R-1010,Tableau,Large datasets cause significant slowdowns. Extracts take forever to refresh.,,X,,X
+R-1011,Slack,Good for quick messages but important info gets buried in busy channels.,,,X,
+R-1012,Confluence,Space organization keeps team wikis clean and discoverable.,,,X,
+R-1013,ServiceNow,Self-service portal has dramatically reduced the number of calls to our help desk.,,,X,
+R-1014,Zoom,Security concerns still linger from the Zoom-bombing incidents. IT restricts many features.,,,,X
+R-1015,Workday HCM,Fine for time tracking but the mobile interface could be more user-friendly.,,,X,
+R-1016,Jira,Good for engineering but non-technical stakeholders find it confusing to navigate.,,,X,
+R-1017,SAP ERP,Comprehensive system that handles our entire supply chain flawlessly.,,,X,
+R-1018,Confluence,Works for our wiki needs but page load times could be better.,,X,,
+R-1019,Confluence,Good for documentation but the editor can be frustrating with complex formatting.,,,X,
+R-1020,Zoom,Recording and transcription capabilities are excellent for meeting documentation.,,,X,
+R-1021,Microsoft Teams,Decent video conferencing but screen sharing occasionally lags on large presentations.,,X,,
+R-1022,SharePoint,Functional for document storage but the navigation and folder structure can be confusing.,,,X,
+R-1023,Microsoft Teams,Constant updates break things. The UI changes without warning and disrupts my workflow.,X,,X,
+R-1024,Asana,Timeline view is perfect for cross-functional project planning with dependencies.,,,X,
+R-1025,Power BI,Good for basic dashboards but advanced visualizations can be tricky to build.,,,X,X
+R-1026,Microsoft Teams,Essential for our remote work setup. Video calls are reliable and high quality.,,X,,
+R-1027,Microsoft Teams,,,,,
+R-1028,Confluence,Page templates make it easy to standardize our documentation across teams.,,,X,
+R-1029,Confluence,Central knowledge base has eliminated scattered docs across drives and emails.,,,X,
+R-1030,Asana,Portfolios feature gives leadership a bird's-eye view of all active projects.,,,X,
+R-1031,Asana,Portfolios feature gives leadership a bird's-eye view of all active projects.,,,X,
+R-1032,SAP ERP,Financial reporting is rock solid. Month-end close is much smoother now.,,,X,X
+R-1033,Workday HCM,The org chart feature is great for understanding team structures across the company.,,,X,
+R-1034,Concur Expense,Mileage tracking is inaccurate. The map routing doesn't match actual driving distances.,,,,X
+R-1035,Jira,Dashboards give leadership clear visibility into team velocity and progress.,,,X,X
+R-1036,DocuSign,Envelope errors are difficult to correct once sent. Re-doing a routing is tedious.,X,,X,
+R-1037,Salesforce CRM,Adequate tool but the interface can feel cluttered with too many fields on screen.,,,X,
+R-1038,SharePoint,Document management is solid. Version history has saved us from overwritten files many times.,,,X,X
+R-1039,Tableau,The mapping features are incredible for our geospatial analysis needs.,,,X,X
+R-1040,Confluence,Integration with Jira means I can link specs directly to development tickets.,X,,X,
+R-1041,Slack,"The emoji reactions reduce unnecessary reply messages. Small feature, big impact.",,,X,
+R-1042,Jira,Too many fields and options on every issue. Screen is overwhelmingly cluttered.,,,X,
+R-1043,Workday HCM,Adequate for benefits enrollment but the comparison tools could be more robust.,,,X,
+R-1044,DocuSign,Envelope errors are difficult to correct once sent. Re-doing a routing is tedious.,X,,X,
+R-1045,SharePoint,Works for our needs but building custom pages requires more effort than it should.,,,X,
+R-1046,Workday HCM,Payroll processing is accurate and transparent. I can see every deduction clearly.,,,,X
+R-1047,ServiceNow,Performance degrades significantly when running complex queries or large reports.,,X,,X
+R-1048,Zoom,Virtual backgrounds and touch-up features make working from home more professional.,,,X,
+R-1049,Microsoft Teams,Constant updates break things. The UI changes without warning and disrupts my workflow.,X,,X,
+R-1050,SharePoint,Team sites keep project documents organized and accessible to the right people.,,,X,
+R-1051,Power BI,Scheduled data refreshes keep our dashboards current without manual intervention.,,X,,X
+R-1052,Slack,Huddles are perfect for quick discussions without scheduling a formal meeting.,,,X,
+R-1053,SAP ERP,Comprehensive system that handles our entire supply chain flawlessly.,,,X,
+R-1054,ServiceNow,Self-service portal has dramatically reduced the number of calls to our help desk.,,,X,
+R-1055,Workday HCM,The app crashed while I was trying to save my personal profile,X,,,
+R-1056,ServiceNow,Works for IT service management but the interface can feel bloated for simple requests.,,,X,
+R-1057,Asana,Task assignments and due dates keep our team accountable without micromanaging.,,,X,
+R-1058,SharePoint,Team sites keep project documents organized and accessible to the right people.,,,X,
+R-1059,Microsoft Teams,Memory usage is excessive. My laptop slows to a crawl when Teams is running.,,X,,
+R-1060,Concur Expense,Integration with our corporate card means transactions import automatically.,X,,,X
+R-1061,Zoom,Solid for video calls but we use Teams for most collaboration so Zoom feels redundant.,,,X,
+R-1062,Salesforce CRM,Adequate tool but the interface can feel cluttered with too many fields on screen.,,,X,
+R-1063,Jira,Too many fields and options on every issue. Screen is overwhelmingly cluttered.,,,X,
+R-1064,Tableau,Publishing dashboards to Tableau Server lets the whole org access insights.,,,,X
+R-1065,Zoom,Recording and transcription capabilities are excellent for meeting documentation.,,,X,
+R-1066,Confluence,Integration with Jira means I can link specs directly to development tickets.,X,,X,
+R-1067,Jira,Dashboards give leadership clear visibility into team velocity and progress.,,,X,X
+R-1068,Asana,The free tier is too limited for any real team use. Feels like a forced upgrade.,,,X,
+R-1069,Tableau,Drag-and-drop interface makes it easy to explore data without coding.,,,X,X
+R-1070,Workday HCM,The org chart feature is great for understanding team structures across the company.,,,X,
+R-1071,Concur Expense,Receipt scanning via the mobile app is fantastic. Snap a photo and it auto-fills fields.,,,X,X
+R-1072,Asana,Custom fields let us track everything specific to our workflow.,,,X,
+R-1073,Asana,Task assignments and due dates keep our team accountable without micromanaging.,,,X,
+R-1074,Zoom,Virtual backgrounds and touch-up features make working from home more professional.,,,X,
+R-1075,Concur Expense,Integration with our corporate card means transactions import automatically.,X,,,X
+R-1076,Slack,Huddles are perfect for quick discussions without scheduling a formal meeting.,,,X,
+R-1077,ServiceNow,The catalog request forms are confusing. Users constantly submit the wrong request type.,,,X,
+R-1078,Workday HCM,Onboarding workflow made my first week so much easier. Everything was in one place.,,,X,
+R-1079,Zoom,Virtual backgrounds and touch-up features make working from home more professional.,,,X,
+R-1080,Microsoft Teams,Does the job for collaboration but the file organization within channels is confusing.,,,X,
+R-1081,Zoom,Security concerns still linger from the Zoom-bombing incidents. IT restricts many features.,,,,X
+R-1082,Zoom,Most reliable video platform we've used. Calls rarely drop even on weak connections.,,X,,
+R-1083,Zoom,Good video quality but the chat feature is basic compared to dedicated messaging tools.,,,X,
+R-1084,Asana,Task assignments and due dates keep our team accountable without micromanaging.,,,X,
+R-1085,Asana,Portfolios feature gives leadership a bird's-eye view of all active projects.,,,X,
+R-1086,Microsoft Teams,Essential for our remote work setup. Video calls are reliable and high quality.,,X,,
+R-1087,Workday HCM,PTO requests and approvals are a breeze. Love the simple calendar view.,,,X,
+R-1088,Asana,Decent for collaboration but the mobile app is clunkier than the desktop version.,,,X,
+R-1089,Confluence,Page templates make it easy to standardize our documentation across teams.,,,X,
+R-1090,DocuSign,Works well for standard signatures but complex multi-party workflows need careful setup.,X,,,
+R-1091,SAP ERP,Transaction codes are impossible to remember. I keep a cheat sheet just to navigate.,X,,X,
+R-1092,Workday HCM,Expense reporting is clunky. Attaching receipts and categorizing expenses is painful.,,,X,X
+R-1093,Tableau,Visual analytics are stunning. Stakeholders actually engage with our data now.,,,,X
+R-1094,Tableau,Version compatibility between Desktop and Server is a constant headache.,X,,,
+R-1095,Jira,Permissions model is needlessly complex. Getting access to the right project is always a battle.,X,,,
+R-1096,Confluence,Page templates make it easy to standardize our documentation across teams.,,,X,
+R-1097,SharePoint,Page load times are horrendous. Opening a document library feels like an eternity.,,X,,
+R-1098,SharePoint,Integration with Teams and OneDrive creates a unified file management experience.,X,,,
+R-1099,Concur Expense,Integration with our corporate card means transactions import automatically.,X,,,X
+R-1100,Asana,Portfolios feature gives leadership a bird's-eye view of all active projects.,,,X,
+R-1101,Confluence,Works for our wiki needs but page load times could be better.,,X,,
+R-1102,Tableau,License costs are extremely high. We can't afford to give access to everyone who needs it.,,,,X
+R-1103,SharePoint,Document management is solid. Version history has saved us from overwritten files many times.,,,X,X
+R-1104,Workday HCM,Handles basic HR tasks well but the navigation takes getting used to.,,,X,
+R-1105,DocuSign,Audit trail and compliance features give our legal team peace of mind.,,,,X
+R-1106,Microsoft Teams,It's our standard tool. Works well enough but nothing spectacular.,,,X,
+R-1107,Salesforce CRM,Custom reports are very powerful. I can slice data any way I need for forecasting.,,,,X
+R-1108,Jira,Powerful for project tracking but overkill for simple task management.,,,X,
+R-1109,Confluence,The new editor removed features we relied on. Migration broke many of our pages.,X,,X,
+R-1110,DocuSign,Audit trail and compliance features give our legal team peace of mind.,,,,X
+R-1111,SAP ERP,The data is accurate but extracting custom reports requires specialized knowledge.,,,,X
+R-1112,Salesforce CRM,Workflow automation has saved our team hours of manual data entry each week.,,,,X
+R-1113,Confluence,Integration with Jira means I can link specs directly to development tickets.,X,,X,
+R-1114,Power BI,Scheduled data refreshes keep our dashboards current without manual intervention.,,X,,X
+R-1115,Jira,Does what we need but the admin configuration is overly complex.,X,,X,
+R-1116,Confluence,Works for our wiki needs but page load times could be better.,,X,,
+R-1117,SharePoint,Document management is solid. Version history has saved us from overwritten files many times.,,,X,X
+R-1118,ServiceNow,Good for tracking tickets but reporting feels limited without add-on modules.,,,,X
+R-1119,SAP ERP,Financial reporting is rock solid. Month-end close is much smoother now.,,,X,X
+R-1120,Tableau,Powerful but requires a solid understanding of data modeling to build effective dashboards.,,,,X
+R-1121,DocuSign,Reliable for basic e-signatures but the admin console could be more intuitive.,X,X,X,
+R-1122,Concur Expense,Itemizing hotel bills is an absolute nightmare. The form is overly complicated.,,,X,
+R-1123,Confluence,Good for documentation but the editor can be frustrating with complex formatting.,,,X,
+R-1124,Slack,Best messaging tool we've used. Threads keep conversations clean and organized.,,,X,
+R-1125,Salesforce CRM,Custom reports are very powerful. I can slice data any way I need for forecasting.,,,,X
+R-1126,Tableau,Version compatibility between Desktop and Server is a constant headache.,X,,,
+R-1127,Jira,Sprint planning and backlog management are excellent. Our agile process depends on it.,,,X,
+R-1128,Jira,Too many fields and options on every issue. Screen is overwhelmingly cluttered.,,,X,
+R-1129,SAP ERP,Audit trail capabilities are excellent for compliance requirements.,,,X,X
+R-1130,Salesforce CRM,Workflow automation has saved our team hours of manual data entry each week.,,,,X
+R-1131,ServiceNow,Mobile experience is poor. The app barely works on my phone when I'm on call.,,,X,
+R-1132,Slack,Integrations with our other tools are amazing. I get alerts right where I work.,X,,,
+R-1133,Concur Expense,Approval workflow is clear and transparent. I always know where my report stands.,,,,X
+R-1134,Asana,Task assignments and due dates keep our team accountable without micromanaging.,,,X,
+R-1135,Asana,Custom fields let us track everything specific to our workflow.,,,X,
+R-1136,Slack,Convenient but it's easy to get distracted with too many channels and DMs.,,,X,
+R-1137,Jira,Custom workflows match our dev process perfectly. Very flexible configuration.,X,,,
+R-1138,Confluence,Formatting breaks constantly when copying from Word or other sources. Very annoying.,,,X,
+R-1139,Power BI,Report rendering in the web browser is noticeably slower than in Desktop app.,,X,,X
+R-1140,Slack,Good for quick messages but important info gets buried in busy channels.,,,X,
+R-1141,SAP ERP,Error messages are cryptic and unhelpful. I always need to call IT support.,X,,X,
+R-1142,Concur Expense,Works for standard expenses but international travel reimbursement is confusing.,,,X,
+R-1143,ServiceNow,Performance degrades significantly when running complex queries or large reports.,,X,,X
+R-1144,SharePoint,Integration with Teams and OneDrive creates a unified file management experience.,X,,,
+R-1145,Jira,Sprint planning and backlog management are excellent. Our agile process depends on it.,,,X,
+R-1146,Power BI,Good for basic dashboards but advanced visualizations can be tricky to build.,,,X,X
+R-1147,DocuSign,Envelope errors are difficult to correct once sent. Re-doing a routing is tedious.,X,,X,
+R-1148,Workday HCM,Onboarding workflow made my first week so much easier. Everything was in one place.,,,X,
+R-1149,Tableau,The mapping features are incredible for our geospatial analysis needs.,,,X,X
