@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SetFit Model Report — CBRE Classifier</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f4f5f7;
+      color: #1a1a2e;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #003087;
+      color: #fff;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    header h1 { font-size: 1.25rem; font-weight: 600; }
+    header .subtitle { font-size: 0.85rem; opacity: 0.75; margin-top: 2px; }
+
+    .logo {
+      font-size: 1.5rem; font-weight: 800; background: #00a651; color: #fff;
+      width: 48px; height: 48px; border-radius: 6px; display: flex;
+      align-items: center; justify-content: center; letter-spacing: -1px; flex-shrink: 0;
+    }
+
+    nav {
+      background: #fff;
+      border-bottom: 1px solid #e4e7ec;
+      padding: 0 32px;
+      display: flex;
+    }
+
+    nav a {
+      display: inline-block;
+      padding: 14px 18px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #6b7a8d;
+      text-decoration: none;
+      border-bottom: 3px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    nav a:hover { color: #003087; }
+    nav a.active { color: #003087; border-bottom-color: #003087; }
+
+    main {
+      max-width: 900px;
+      width: 100%;
+      margin: 36px auto;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 28px 32px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+    }
+
+    .card h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #003087;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e4e7ec;
+    }
+
+    .card h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #2d3748;
+      margin: 20px 0 8px;
+    }
+
+    .card h3:first-of-type { margin-top: 0; }
+
+    p { font-size: 0.9rem; line-height: 1.7; color: #4a5568; }
+
+    code {
+      background: #f0f2f5;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 0.82rem;
+      color: #003087;
+      font-family: "SF Mono", "Fira Code", monospace;
+    }
+
+    /* Model badge */
+    .model-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #003087 0%, #00226b 100%);
+      color: #fff;
+      border-radius: 10px;
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .model-badge .badge-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      opacity: 0.7;
+    }
+
+    .model-badge .badge-name { font-size: 1rem; font-weight: 700; }
+    .model-badge .badge-sub { font-size: 0.78rem; opacity: 0.75; margin-top: 2px; }
+
+    .badge-divider {
+      width: 1px;
+      height: 40px;
+      background: rgba(255,255,255,0.25);
+      margin: 0 8px;
+    }
+
+    /* Stats row */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    @media (max-width: 600px) { .stats-row { grid-template-columns: 1fr 1fr; } }
+
+    .stat-box { background: #f8f9fa; border-radius: 10px; padding: 18px 16px; text-align: center; }
+    .stat-value { font-size: 2rem; font-weight: 700; color: #003087; line-height: 1; }
+    .stat-label { font-size: 0.78rem; color: #6b7a8d; margin-top: 6px; font-weight: 500; }
+
+    /* Two-phase training */
+    .phases { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px; }
+    @media (max-width: 560px) { .phases { grid-template-columns: 1fr; } }
+
+    .phase-box { border-radius: 10px; padding: 18px 20px; }
+    .phase-box.phase-1 { background: #eef2fb; border: 1.5px solid #c5d0f0; }
+    .phase-box.phase-2 { background: #eef6f0; border: 1.5px solid #b7e0c8; }
+
+    .phase-num { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+    .phase-1 .phase-num { color: #3358c4; }
+    .phase-2 .phase-num { color: #00703a; }
+
+    .phase-title { font-size: 0.88rem; font-weight: 700; color: #1a1a2e; margin-bottom: 8px; }
+    .phase-detail { font-size: 0.82rem; line-height: 1.6; color: #4a5568; }
+    .phase-detail li { margin-left: 14px; list-style: disc; }
+
+    /* Pipeline */
+    .pipeline { display: flex; align-items: stretch; gap: 0; flex-wrap: wrap; margin-top: 8px; }
+
+    .pipe-step {
+      background: #eef2fb;
+      border: 1.5px solid #c5d0f0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #003087;
+      text-align: center;
+      flex: 1;
+      min-width: 100px;
+      line-height: 1.4;
+    }
+
+    .pipe-step span { font-weight: 400; color: #6b7a8d; display: block; margin-top: 3px; font-size: 0.75rem; }
+    .pipe-arrow { color: #9aa5b4; font-size: 1.1rem; padding: 0 5px; display: flex; align-items: center; flex-shrink: 0; }
+
+    /* Label distribution */
+    .label-dist { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+    .dist-row { display: flex; align-items: center; gap: 12px; }
+    .dist-name { font-size: 0.82rem; font-weight: 600; color: #2d3748; width: 120px; flex-shrink: 0; }
+    .dist-bar-bg { flex: 1; height: 10px; background: #e4e7ec; border-radius: 5px; overflow: hidden; }
+    .dist-bar { height: 100%; border-radius: 5px; background: #003087; }
+    .dist-count { font-size: 0.8rem; color: #6b7a8d; width: 70px; text-align: right; flex-shrink: 0; }
+
+    /* Results */
+    .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 4px; }
+    @media (max-width: 600px) { .results-grid { grid-template-columns: 1fr; } }
+
+    .result-card { border-radius: 10px; border: 1.5px solid #e4e7ec; overflow: hidden; }
+
+    .result-header {
+      padding: 12px 16px;
+      background: #003087;
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .result-header.perfect { background: #00703a; }
+
+    .result-accuracy {
+      background: rgba(255,255,255,0.2);
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.78rem;
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+
+    thead th {
+      background: #f8f9fa;
+      padding: 8px 12px;
+      text-align: right;
+      font-weight: 600;
+      color: #6b7a8d;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    thead th:first-child { text-align: left; }
+
+    tbody td { padding: 9px 12px; border-top: 1px solid #f0f2f5; text-align: right; color: #2d3748; }
+    tbody td:first-child { text-align: left; font-weight: 500; }
+    tbody tr:last-child td { color: #9aa5b4; font-style: italic; }
+
+    .f1-cell { font-weight: 700; }
+    .f1-perfect { color: #00703a; }
+    .f1-good    { color: #2d8a5a; }
+    .f1-mid     { color: #b7791f; }
+    .f1-low     { color: #c53030; }
+
+    /* Comparison table */
+    .compare-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-top: 8px; }
+
+    .compare-table th {
+      padding: 10px 14px;
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #6b7a8d;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 2px solid #e4e7ec;
+    }
+
+    .compare-table th:first-child { text-align: left; }
+    .compare-table th:not(:first-child) { text-align: center; }
+    .compare-table td { padding: 10px 14px; border-top: 1px solid #f0f2f5; color: #2d3748; }
+    .compare-table td:first-child { font-weight: 600; }
+    .compare-table td:not(:first-child) { text-align: center; }
+
+    .improved { color: #00703a; font-weight: 700; }
+    .same     { color: #b7791f; }
+    .delta    { font-size: 0.75rem; margin-left: 4px; }
+
+    ul { margin-top: 8px; padding-left: 18px; display: flex; flex-direction: column; gap: 8px; }
+    li { font-size: 0.9rem; line-height: 1.6; color: #4a5568; }
+    li strong { color: #2d3748; }
+
+    .notice { border-radius: 8px; padding: 14px 18px; font-size: 0.875rem; margin-top: 16px; line-height: 1.6; }
+    .notice.yellow { background: #fffbeb; border: 1px solid #f6e05e; color: #744210; }
+    .notice.green  { background: #f0faf4; border: 1px solid #9ae6b4; color: #276749; }
+    .notice.blue   { background: #ebf4ff; border: 1px solid #90cdf4; color: #2a4a7f; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">CB</div>
+    <div>
+      <h1>Customer Feedback Classifier</h1>
+      <div class="subtitle">SetFit Model — Training, Testing &amp; Results</div>
+    </div>
+  </header>
+
+  <nav>
+    <a href="/">Classify</a>
+    <a href="/report">Model Report</a>
+    <a href="/report/setfit" class="active">SetFit Report</a>
+  </nav>
+
+  <main>
+
+    <!-- Overview -->
+    <div class="card">
+      <h2>Overview</h2>
+
+      <div class="model-badge">
+        <div>
+          <div class="badge-label">Framework</div>
+          <div class="badge-name">SetFit</div>
+          <div class="badge-sub">Sentence Transformers Fine-tuning</div>
+        </div>
+        <div class="badge-divider"></div>
+        <div>
+          <div class="badge-label">Base Model</div>
+          <div class="badge-name">all-MiniLM-L6-v2</div>
+          <div class="badge-sub">22M parameters · 384-dim embeddings</div>
+        </div>
+        <div class="badge-divider"></div>
+        <div>
+          <div class="badge-label">Strategy</div>
+          <div class="badge-name">One-vs-Rest</div>
+          <div class="badge-sub">Multi-label classification</div>
+        </div>
+      </div>
+
+      <p>
+        This report covers the <strong>SetFit</strong> (Sentence Transformer Fine-tuning) version
+        of the CBRE customer feedback classifier. Unlike the baseline approach that used a frozen
+        encoder, SetFit <em>fine-tunes the sentence transformer itself</em> through contrastive
+        learning on automatically generated sentence pairs before fitting the classifier head.
+        This makes it particularly effective for small labeled datasets.
+      </p>
+      <p style="margin-top:12px">
+        The classifier assigns one or more category labels — <strong>Technical</strong>,
+        <strong>Performance</strong>, <strong>UX</strong>, and <strong>Data/Security</strong> —
+        to open-ended customer feedback on internal software applications.
+        Labels are not mutually exclusive.
+      </p>
+    </div>
+
+    <!-- Dataset -->
+    <div class="card">
+      <h2>Dataset</h2>
+
+      <div class="stats-row" style="margin-bottom:24px">
+        <div class="stat-box">
+          <div class="stat-value">149</div>
+          <div class="stat-label">Labeled Comments</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">4</div>
+          <div class="stat-label">Category Labels</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">14</div>
+          <div class="stat-label">Applications</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">1.14</div>
+          <div class="stat-label">Avg Labels / Comment</div>
+        </div>
+      </div>
+
+      <h3>Label Distribution (positive examples)</h3>
+      <div class="label-dist">
+        <div class="dist-row">
+          <div class="dist-name">UX</div>
+          <div class="dist-bar-bg"><div class="dist-bar" style="width:82%"></div></div>
+          <div class="dist-count">~122 of 149</div>
+        </div>
+        <div class="dist-row">
+          <div class="dist-name">Data/Security</div>
+          <div class="dist-bar-bg"><div class="dist-bar" style="width:28%"></div></div>
+          <div class="dist-count">~42 of 149</div>
+        </div>
+        <div class="dist-row">
+          <div class="dist-name">Technical</div>
+          <div class="dist-bar-bg"><div class="dist-bar" style="width:18%"></div></div>
+          <div class="dist-count">~27 of 149</div>
+        </div>
+        <div class="dist-row">
+          <div class="dist-name">Performance</div>
+          <div class="dist-bar-bg"><div class="dist-bar" style="width:13%"></div></div>
+          <div class="dist-count">~19 of 149</div>
+        </div>
+      </div>
+
+      <div class="notice yellow">
+        <strong>Class imbalance:</strong> UX dominates at ~82% positive rate. SetFit's contrastive
+        pair generation balances positive and negative pairs per label during encoder fine-tuning —
+        a structural advantage over approaches that train only the classifier head on imbalanced data.
+      </div>
+    </div>
+
+    <!-- Architecture & Training -->
+    <div class="card">
+      <h2>Model Architecture &amp; Training</h2>
+
+      <h3>Two-Phase Training</h3>
+      <div class="phases">
+        <div class="phase-box phase-1">
+          <div class="phase-num">Phase 1 — Contrastive Fine-tuning</div>
+          <div class="phase-title">Encoder Adaptation</div>
+          <div class="phase-detail">
+            <ul>
+              <li>Generates sentence pairs from labeled examples</li>
+              <li>5,040 pairs from 126 training comments</li>
+              <li>20 iterations per label · batch size 16</li>
+              <li>Fine-tunes encoder weights via cosine similarity loss</li>
+              <li>Pulls same-label comments together in embedding space</li>
+              <li>~30 seconds on Apple Silicon (MPS)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="phase-box phase-2">
+          <div class="phase-num">Phase 2 — Classifier Fitting</div>
+          <div class="phase-title">Head Training</div>
+          <div class="phase-detail">
+            <ul>
+              <li>Encodes all training examples with the fine-tuned encoder</li>
+              <li>Fits 4 independent logistic regression classifiers</li>
+              <li>One-vs-rest strategy for multi-label output</li>
+              <li>Outputs per-label probability + binary prediction</li>
+              <li>&lt;1 second to fit</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:24px">Inference Pipeline</h3>
+      <div class="pipeline">
+        <div class="pipe-step">Raw Comment<span>text input</span></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">Fine-tuned<br>Encoder<span>all-MiniLM-L6-v2</span></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">384-dim<br>Embedding<span>domain-adapted</span></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">4× Logistic<br>Regression<span>one-vs-rest</span></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">Labels +<br>Confidence<span>multi-label</span></div>
+      </div>
+
+      <h3 style="margin-top:24px">Hyperparameters</h3>
+      <table style="font-size:0.85rem">
+        <thead>
+          <tr>
+            <th style="text-align:left">Parameter</th>
+            <th style="text-align:left">Value</th>
+            <th style="text-align:left">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>num_epochs</code></td><td>1</td><td style="color:#6b7a8d;text-align:left">Contrastive training epochs</td></tr>
+          <tr><td><code>num_iterations</code></td><td>20</td><td style="color:#6b7a8d;text-align:left">Sentence pairs generated per class per label</td></tr>
+          <tr><td><code>batch_size</code></td><td>16</td><td style="color:#6b7a8d;text-align:left">Pairs per gradient update</td></tr>
+          <tr><td><code>multi_target_strategy</code></td><td>one-vs-rest</td><td style="color:#6b7a8d;text-align:left">Independent binary classifier per label</td></tr>
+          <tr><td><code>base_model</code></td><td>all-MiniLM-L6-v2</td><td style="color:#6b7a8d;text-align:left">22M param distilled BERT, 384-dim output</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Train / Test Split</h3>
+      <p>
+        Data was split 85% / 15%, yielding <strong>126 training</strong> and <strong>23 test</strong> examples.
+        The evaluation model is trained on the split only. After reporting metrics, the final production
+        model is retrained on all 149 examples and saved to <code>models/setfit/</code>.
+      </p>
+    </div>
+
+    <!-- Results -->
+    <div class="card">
+      <h2>Test Results</h2>
+      <p style="margin-bottom:16px">
+        Evaluated on 23 held-out comments not seen during training.
+        Metrics are per-label binary classification (positive class = label present).
+      </p>
+
+      <div class="results-grid">
+
+        <div class="result-card">
+          <div class="result-header">
+            Technical
+            <span class="result-accuracy">Accuracy 91%</span>
+          </div>
+          <table>
+            <thead><tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1</th><th>Support</th></tr></thead>
+            <tbody>
+              <tr><td>No</td><td>0.91</td><td>1.00</td><td class="f1-cell f1-good">0.95</td><td>20</td></tr>
+              <tr><td>Yes</td><td>1.00</td><td>0.33</td><td class="f1-cell f1-mid">0.50</td><td>3</td></tr>
+              <tr><td>Weighted avg</td><td>0.92</td><td>0.91</td><td class="f1-cell">0.89</td><td>23</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="result-card">
+          <div class="result-header perfect">
+            Performance
+            <span class="result-accuracy">Accuracy 100%</span>
+          </div>
+          <table>
+            <thead><tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1</th><th>Support</th></tr></thead>
+            <tbody>
+              <tr><td>No</td><td>1.00</td><td>1.00</td><td class="f1-cell f1-perfect">1.00</td><td>21</td></tr>
+              <tr><td>Yes</td><td>1.00</td><td>1.00</td><td class="f1-cell f1-perfect">1.00</td><td>2</td></tr>
+              <tr><td>Weighted avg</td><td>1.00</td><td>1.00</td><td class="f1-cell">1.00</td><td>23</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="result-card">
+          <div class="result-header">
+            UX
+            <span class="result-accuracy">Accuracy 87%</span>
+          </div>
+          <table>
+            <thead><tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1</th><th>Support</th></tr></thead>
+            <tbody>
+              <tr><td>No</td><td>1.00</td><td>0.50</td><td class="f1-cell f1-mid">0.67</td><td>6</td></tr>
+              <tr><td>Yes</td><td>0.85</td><td>1.00</td><td class="f1-cell f1-good">0.92</td><td>17</td></tr>
+              <tr><td>Weighted avg</td><td>0.89</td><td>0.87</td><td class="f1-cell">0.85</td><td>23</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="result-card">
+          <div class="result-header perfect">
+            Data/Security
+            <span class="result-accuracy">Accuracy 100%</span>
+          </div>
+          <table>
+            <thead><tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1</th><th>Support</th></tr></thead>
+            <tbody>
+              <tr><td>No</td><td>1.00</td><td>1.00</td><td class="f1-cell f1-perfect">1.00</td><td>19</td></tr>
+              <tr><td>Yes</td><td>1.00</td><td>1.00</td><td class="f1-cell f1-perfect">1.00</td><td>4</td></tr>
+              <tr><td>Weighted avg</td><td>1.00</td><td>1.00</td><td class="f1-cell">1.00</td><td>23</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Comparison -->
+    <div class="card">
+      <h2>SetFit vs. Frozen Encoder Baseline</h2>
+      <p style="margin-bottom:16px">
+        F1 score on the positive class (label present) across 23 held-out test examples,
+        comparing SetFit fine-tuning against the previous frozen encoder + logistic regression approach.
+      </p>
+
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>Label</th>
+            <th>Frozen Encoder F1</th>
+            <th>SetFit F1</th>
+            <th>Change</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Technical</td>
+            <td>0.50</td>
+            <td class="same">0.50</td>
+            <td class="same">— no change</td>
+          </tr>
+          <tr>
+            <td>Performance</td>
+            <td>0.00</td>
+            <td class="improved">1.00</td>
+            <td class="improved">+1.00 <span class="delta">▲ perfect</span></td>
+          </tr>
+          <tr>
+            <td>UX</td>
+            <td>0.85</td>
+            <td class="improved">0.92</td>
+            <td class="improved">+0.07 <span class="delta">▲</span></td>
+          </tr>
+          <tr>
+            <td>Data/Security</td>
+            <td>0.67</td>
+            <td class="improved">1.00</td>
+            <td class="improved">+0.33 <span class="delta">▲ perfect</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="notice green">
+        <strong>Key improvement:</strong> By fine-tuning the encoder through contrastive learning,
+        SetFit learns domain-specific representations where performance bottleneck language and
+        security/compliance language become clearly separable — eliminating the false negatives that
+        plagued the frozen-encoder approach on minority classes.
+      </div>
+    </div>
+
+    <!-- Interpretation -->
+    <div class="card">
+      <h2>Interpretation &amp; Limitations</h2>
+
+      <h3>What works well</h3>
+      <ul>
+        <li><strong>Performance &amp; Data/Security (F1 = 1.00):</strong> Perfect precision and recall on both labels. Contrastive training draws clear boundaries between slowness/latency language and security/compliance language.</li>
+        <li><strong>UX recall (1.00):</strong> Every UX-related comment is correctly identified — the most operationally valuable result for service improvement prioritization.</li>
+        <li><strong>Technical precision (1.00):</strong> Zero false positives. Every comment flagged as Technical genuinely describes a technical issue.</li>
+      </ul>
+
+      <h3 style="margin-top:20px">Where it struggles</h3>
+      <ul>
+        <li><strong>Technical recall (0.33):</strong> Only 1 of 3 Technical test examples was correctly identified. With just 3 positive test examples, a single miss has outsized metric impact — more labeled Technical data is needed.</li>
+        <li><strong>UX "No" recall (0.50):</strong> 3 of 6 non-UX comments were incorrectly predicted as UX. The dominant-class bias persists, though all actual positive UX predictions are now correct (precision 1.00 for "No").</li>
+        <li><strong>Small test set (n=23):</strong> Individual misclassifications swing metrics significantly. Results are directionally informative but not statistically robust until the dataset grows beyond ~500 examples.</li>
+      </ul>
+
+      <h3 style="margin-top:20px">Recommendations</h3>
+      <ul>
+        <li><strong>Expand Technical labeling</strong> — target 50+ positive examples. Technical comments are semantically diverse (integration issues, config complexity, update breakage) and benefit most from additional examples.</li>
+        <li><strong>Increase <code>num_iterations</code></strong> to 40–60 to generate more contrastive pairs and improve encoder specialization for rare classes.</li>
+        <li><strong>Tune the UX classification threshold</strong> below 0.5 to reduce false positives on the dominant class without sacrificing recall.</li>
+        <li><strong>Retrain as data grows</strong> — SetFit retrains in ~25 seconds on this dataset, making periodic retraining as new labeled feedback arrives entirely practical.</li>
+      </ul>
+
+      <div class="notice blue">
+        <strong>Training time:</strong> Phase 1 contrastive fine-tuning completed in ~30s and
+        Phase 2 classifier fitting in under 1s on Apple Silicon (MPS). Full retraining on all
+        149 examples takes approximately 25 seconds — fast enough to retrain on demand.
+      </div>
+    </div>
+
+  </main>
+
+</body>
+</html>

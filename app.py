@@ -19,6 +19,11 @@ def report():
     return render_template("report.html")
 
 
+@app.route("/report/setfit")
+def report_setfit():
+    return render_template("report_setfit.html")
+
+
 @app.route("/classify", methods=["POST"])
 def classify():
     data = request.get_json()
