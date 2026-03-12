@@ -1,62 +1,71 @@
-import joblib
 import numpy as np
 import pandas as pd
 from pathlib import Path
-from sentence_transformers import SentenceTransformer
-from sklearn.linear_model import LogisticRegression
-from sklearn.multioutput import MultiOutputClassifier
+from datasets import Dataset
+from setfit import SetFitModel, Trainer, TrainingArguments
 
 LABELS = ["Technical", "Performance", "UX", "Data/Security"]
-MODEL_DIR = Path(__file__).parent.parent / "models"
-BASE_MODEL = "all-MiniLM-L6-v2"
+MODEL_DIR = Path(__file__).parent.parent / "models" / "setfit"
+BASE_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 
 
 class CommentClassifier:
     def __init__(self):
-        self.encoder = SentenceTransformer(BASE_MODEL)
-        self.classifier: MultiOutputClassifier | None = None
-        self._model_path = MODEL_DIR / "classifier.joblib"
+        self.model: SetFitModel | None = None
 
-    def train(self, csv_path: str):
+    def _parse_csv(self, csv_path: str) -> tuple[list[str], list[list[int]]]:
         df = pd.read_csv(csv_path)
         df = df.dropna(subset=["End-User Comment"])
         df = df[df["End-User Comment"].str.strip() != ""]
+        texts = df["End-User Comment"].tolist()
+        labels = (df[LABELS].fillna("").eq("X")).astype(int).values.tolist()
+        return texts, labels
 
-        y = (df[LABELS].fillna("").eq("X")).astype(int).values
-        X_text = df["End-User Comment"].tolist()
+    def train(self, csv_path: str, num_epochs: int = 1, num_iterations: int = 20):
+        texts, labels = self._parse_csv(csv_path)
+        dataset = Dataset.from_dict({"text": texts, "label": labels})
 
-        print(f"Encoding {len(X_text)} comments...")
-        embeddings = self.encoder.encode(X_text, show_progress_bar=True)
-
-        self.classifier = MultiOutputClassifier(
-            LogisticRegression(max_iter=1000, C=1.0, random_state=42)
+        model = SetFitModel.from_pretrained(
+            BASE_MODEL,
+            multi_target_strategy="one-vs-rest",
+            labels=LABELS,
         )
-        self.classifier.fit(embeddings, y)
 
-        MODEL_DIR.mkdir(exist_ok=True)
-        joblib.dump(self.classifier, self._model_path)
-        print(f"Model saved to {self._model_path}")
+        trainer = Trainer(
+            model=model,
+            args=TrainingArguments(
+                num_epochs=num_epochs,
+                batch_size=16,
+                num_iterations=num_iterations,
+                output_dir=str(MODEL_DIR),
+            ),
+            train_dataset=dataset,
+        )
+
+        print(f"Fine-tuning SetFit on {len(texts)} comments...")
+        trainer.train()
+
+        MODEL_DIR.mkdir(parents=True, exist_ok=True)
+        model.save_pretrained(str(MODEL_DIR))
+        self.model = model
+        print(f"Model saved to {MODEL_DIR}")
 
     def load(self):
-        if not self._model_path.exists():
+        if not self.is_trained():
             raise FileNotFoundError(
-                f"No trained model at {self._model_path}. Run: python main.py train"
+                f"No trained model at {MODEL_DIR}. Run: python main.py train"
             )
-        self.classifier = joblib.load(self._model_path)
+        self.model = SetFitModel.from_pretrained(str(MODEL_DIR))
 
     def predict(self, text: str) -> dict:
-        if self.classifier is None:
+        if self.model is None:
             self.load()
-        embedding = self.encoder.encode([text])
-        predictions = self.classifier.predict(embedding)[0]
-        probas = [
-            est.predict_proba(embedding)[0][1]
-            for est in self.classifier.estimators_
-        ]
+        probas = self.model.predict_proba([text])[0].tolist()
+        predictions = self.model.predict([text])[0].tolist()
         return {
             label: {"predicted": bool(pred), "confidence": round(float(prob), 3)}
             for label, pred, prob in zip(LABELS, predictions, probas)
         }
 
     def is_trained(self) -> bool:
-        return self._model_path.exists()
+        return (MODEL_DIR / "config.json").exists()
