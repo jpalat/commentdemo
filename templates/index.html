@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CBRE Customer Feedback Classifier</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f4f5f7;
+      color: #1a1a2e;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #003087;
+      color: #fff;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    header h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    header .subtitle {
+      font-size: 0.85rem;
+      opacity: 0.75;
+      margin-top: 2px;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: #00a651;
+      color: #fff;
+      width: 48px;
+      height: 48px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      letter-spacing: -1px;
+      flex-shrink: 0;
+    }
+
+    main {
+      flex: 1;
+      max-width: 760px;
+      width: 100%;
+      margin: 40px auto;
+      padding: 0 16px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+    }
+
+    .card h2 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #003087;
+      margin-bottom: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 14px;
+      font-size: 0.95rem;
+      border: 1.5px solid #d0d5dd;
+      border-radius: 8px;
+      resize: vertical;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: inherit;
+      color: #1a1a2e;
+      line-height: 1.5;
+    }
+
+    textarea:focus { border-color: #003087; }
+
+    textarea::placeholder { color: #9aa5b4; }
+
+    button {
+      margin-top: 16px;
+      background: #003087;
+      color: #fff;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    button:hover { background: #00226b; }
+    button:active { transform: scale(0.98); }
+    button:disabled { background: #9aa5b4; cursor: not-allowed; }
+
+    .results {
+      margin-top: 28px;
+      display: none;
+    }
+
+    .results h3 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #6b7a8d;
+      margin-bottom: 14px;
+    }
+
+    .labels-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 480px) { .labels-grid { grid-template-columns: 1fr; } }
+
+    .label-card {
+      border-radius: 10px;
+      padding: 16px 18px;
+      border: 2px solid transparent;
+      transition: all 0.25s ease;
+    }
+
+    .label-card.active {
+      background: #eef6f0;
+      border-color: #00a651;
+    }
+
+    .label-card.inactive {
+      background: #f8f9fa;
+      border-color: #e4e7ec;
+    }
+
+    .label-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .label-card.active .label-name { color: #00703a; }
+    .label-card.inactive .label-name { color: #6b7a8d; }
+
+    .confidence-bar-bg {
+      height: 6px;
+      border-radius: 3px;
+      background: #e4e7ec;
+      overflow: hidden;
+    }
+
+    .confidence-bar {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+
+    .label-card.active .confidence-bar { background: #00a651; }
+    .label-card.inactive .confidence-bar { background: #c0c8d4; }
+
+    .confidence-text {
+      font-size: 0.78rem;
+      margin-top: 6px;
+      color: #6b7a8d;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      float: right;
+      margin-top: 1px;
+    }
+
+    .label-card.active .badge {
+      background: #00a651;
+      color: #fff;
+    }
+
+    .label-card.inactive .badge {
+      background: #e4e7ec;
+      color: #9aa5b4;
+    }
+
+    .error-msg {
+      margin-top: 16px;
+      padding: 12px 16px;
+      background: #fff1f0;
+      border: 1px solid #ffa39e;
+      border-radius: 8px;
+      color: #cf1322;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .comment-echo {
+      font-size: 0.88rem;
+      color: #4a5568;
+      background: #f8f9fa;
+      border-left: 3px solid #003087;
+      padding: 10px 14px;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">CB</div>
+    <div>
+      <h1>Customer Feedback Classifier</h1>
+      <div class="subtitle">Classify service feedback into Technical, Performance, UX, and Data/Security</div>
+    </div>
+  </header>
+
+  <nav style="background:#fff;border-bottom:1px solid #e4e7ec;padding:0 32px;display:flex;gap:0;">
+    <a href="/" style="display:inline-block;padding:14px 18px;font-size:0.875rem;font-weight:500;color:#003087;text-decoration:none;border-bottom:3px solid #003087;">Classify</a>
+    <a href="/report" style="display:inline-block;padding:14px 18px;font-size:0.875rem;font-weight:500;color:#6b7a8d;text-decoration:none;border-bottom:3px solid transparent;">Model Report</a>
+  </nav>
+
+  <main>
+    <div class="card">
+      <h2>Classify a Comment</h2>
+      <textarea id="commentInput" placeholder="Enter a customer service comment here…"></textarea>
+      <button id="classifyBtn" onclick="classify()">Classify</button>
+
+      <div class="error-msg" id="errorMsg"></div>
+
+      <div class="results" id="results">
+        <div class="comment-echo" id="commentEcho"></div>
+        <h3>Classification Results</h3>
+        <div class="labels-grid" id="labelsGrid"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    async function classify() {
+      const input = document.getElementById("commentInput");
+      const btn = document.getElementById("classifyBtn");
+      const errorMsg = document.getElementById("errorMsg");
+      const results = document.getElementById("results");
+      const comment = input.value.trim();
+
+      if (!comment) {
+        showError("Please enter a comment before classifying.");
+        return;
+      }
+
+      errorMsg.style.display = "none";
+      results.style.display = "none";
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Classifying…';
+
+      try {
+        const res = await fetch("/classify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ comment }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showError(data.error || "An error occurred.");
+          return;
+        }
+
+        renderResults(data.comment, data.labels);
+      } catch (err) {
+        showError("Network error. Is the server running?");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Classify";
+      }
+    }
+
+    function renderResults(comment, labels) {
+      document.getElementById("commentEcho").textContent = `"${comment}"`;
+
+      const grid = document.getElementById("labelsGrid");
+      grid.innerHTML = "";
+
+      for (const [label, info] of Object.entries(labels)) {
+        const pct = Math.round(info.confidence * 100);
+        const active = info.predicted;
+        const card = document.createElement("div");
+        card.className = `label-card ${active ? "active" : "inactive"}`;
+        card.innerHTML = `
+          <div class="label-name">
+            ${label}
+            <span class="badge">${active ? "YES" : "NO"}</span>
+          </div>
+          <div class="confidence-bar-bg">
+            <div class="confidence-bar" style="width: ${pct}%"></div>
+          </div>
+          <div class="confidence-text">${pct}% confidence</div>
+        `;
+        grid.appendChild(card);
+      }
+
+      document.getElementById("results").style.display = "block";
+    }
+
+    function showError(msg) {
+      const el = document.getElementById("errorMsg");
+      el.textContent = msg;
+      el.style.display = "block";
+    }
+
+    document.getElementById("commentInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) classify();
+    });
+  </script>
+
+</body>
+</html>

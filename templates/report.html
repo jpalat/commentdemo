@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Model Report — CBRE Classifier</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f4f5f7;
+      color: #1a1a2e;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: #003087;
+      color: #fff;
+      padding: 18px 32px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    header h1 { font-size: 1.25rem; font-weight: 600; }
+    header .subtitle { font-size: 0.85rem; opacity: 0.75; margin-top: 2px; }
+
+    .logo {
+      font-size: 1.5rem; font-weight: 800; background: #00a651; color: #fff;
+      width: 48px; height: 48px; border-radius: 6px; display: flex;
+      align-items: center; justify-content: center; letter-spacing: -1px; flex-shrink: 0;
+    }
+
+    nav {
+      background: #fff;
+      border-bottom: 1px solid #e4e7ec;
+      padding: 0 32px;
+      display: flex;
+      gap: 0;
+    }
+
+    nav a {
+      display: inline-block;
+      padding: 14px 18px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #6b7a8d;
+      text-decoration: none;
+      border-bottom: 3px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    nav a:hover { color: #003087; }
+    nav a.active { color: #003087; border-bottom-color: #003087; }
+
+    main {
+      max-width: 900px;
+      width: 100%;
+      margin: 36px auto;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 28px 32px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+    }
+
+    .card h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #003087;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e4e7ec;
+    }
+
+    .card h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #2d3748;
+      margin: 20px 0 8px;
+    }
+
+    .card h3:first-of-type { margin-top: 0; }
+
+    p {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: #4a5568;
+    }
+
+    /* Stats row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 600px) { .stats-row { grid-template-columns: 1fr 1fr; } }
+
+    .stat-box {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 18px 16px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #003087;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      color: #6b7a8d;
+      margin-top: 6px;
+      font-weight: 500;
+    }
+
+    /* Pipeline diagram */
+    .pipeline {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .pipe-step {
+      background: #eef2fb;
+      border: 1.5px solid #c5d0f0;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #003087;
+      text-align: center;
+      flex: 1;
+      min-width: 110px;
+    }
+
+    .pipe-arrow {
+      color: #9aa5b4;
+      font-size: 1.1rem;
+      padding: 0 6px;
+      flex-shrink: 0;
+    }
+
+    /* Label distribution */
+    .label-dist { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+
+    .dist-row { display: flex; align-items: center; gap: 12px; }
+
+    .dist-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #2d3748;
+      width: 120px;
+      flex-shrink: 0;
+    }
+
+    .dist-bar-bg {
+      flex: 1;
+      height: 10px;
+      background: #e4e7ec;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .dist-bar { height: 100%; border-radius: 5px; background: #003087; }
+
+    .dist-count {
+      font-size: 0.8rem;
+      color: #6b7a8d;
+      width: 70px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* Results table */
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 600px) { .results-grid { grid-template-columns: 1fr; } }
+
+    .result-card {
+      border-radius: 10px;
+      border: 1.5px solid #e4e7ec;
+      overflow: hidden;
+    }
+
+    .result-header {
+      padding: 12px 16px;
+      background: #003087;
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .result-accuracy {
+      background: rgba(255,255,255,0.2);
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.78rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    thead th {
+      background: #f8f9fa;
+      padding: 8px 12px;
+      text-align: right;
+      font-weight: 600;
+      color: #6b7a8d;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    thead th:first-child { text-align: left; }
+
+    tbody td {
+      padding: 9px 12px;
+      border-top: 1px solid #f0f2f5;
+      text-align: right;
+      color: #2d3748;
+    }
+
+    tbody td:first-child { text-align: left; font-weight: 500; }
+
+    tbody tr:last-child td { color: #9aa5b4; font-style: italic; }
+
+    .f1-cell { font-weight: 700; }
+
+    .f1-good { color: #00703a; }
+    .f1-mid  { color: #b7791f; }
+    .f1-low  { color: #c53030; }
+
+    /* Limitations */
+    ul {
+      margin-top: 8px;
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    li { font-size: 0.9rem; line-height: 1.6; color: #4a5568; }
+
+    li strong { color: #2d3748; }
+
+    .notice {
+      background: #fffbeb;
+      border: 1px solid #f6e05e;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 0.875rem;
+      color: #744210;
+      margin-top: 16px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo">CB</div>
+    <div>
+      <h1>Customer Feedback Classifier</h1>
+      <div class="subtitle">Model Training, Testing &amp; Results</div>
+    </div>
+  </header>
+
+  <nav>
+    <a href="/">Classify</a>
+    <a href="/report" class="active">Model Report</a>
+  </nav>
+
+  <main>
+
+    <!-- Overview -->
+    <div class="card">
+      <h2>Overview</h2>
+      <p>
+        This classifier analyzes open-ended customer feedback on internal software applications
+        and assigns one or more category labels — <strong>Technical</strong>, <strong>Performance</strong>,
+        <strong>UX</strong>, and <strong>Data/Security</strong>. Labels are not mutually exclusive;
+        a single comment may belong to multiple categories.
+      </p>
+      <p style="margin-top:12px">
+        The model uses a two-stage approach: a pre-trained
+        <strong>sentence transformer</strong> (<code>all-MiniLM-L6-v2</code>) encodes each comment
+        into a dense semantic embedding, and an independent
+        <strong>logistic regression</strong> binary classifier is trained per label on those embeddings.
+      </p>
+    </div>
+
+    <!-- Dataset -->
+    <div class="card">
+      <h2>Dataset</h2>
+
+      <div class="stats-row" style="margin-bottom:24px">
+        <div class="stat-box">
+          <div class="stat-value">149</div>
+          <div class="stat-label">Labeled Comments</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">4</div>
+          <div class="stat-label">Category Labels</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">14</div>
+          <div class="stat-label">Applications</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">1.14</div>
+          <div class="stat-label">Avg Labels / Comment</div>
+        </div>
+      </div>
+
+      <h3>Label Distribution (positive examples)</h3>
+      <div class="label-dist">
+        <div class="dist-row">
+          <div class="dist-name">UX</div>
+          <div class="dist-bar-bg"><div class="dist-bar" style="width:82%"></div></div>
+          <div class="dist-count">~122 of 149</div>
+        </div>
+        <div class="dist-row">
+          <div class="dist-name">Data/Security</div>
+          <div class="dist-bar-bg"><div class="dist-bar" style="width:28%"></div></div>
+          <div class="dist-count">~42 of 149</div>
+        </div>
+        <div class="dist-row">
+          <div class="dist-name">Technical</div>
+          <div class="dist-bar-bg"><div class="dist-bar" style="width:18%"></div></div>
+          <div class="dist-count">~27 of 149</div>
+        </div>
+        <div class="dist-row">
+          <div class="dist-name">Performance</div>
+          <div class="dist-bar-bg"><div class="dist-bar" style="width:13%"></div></div>
+          <div class="dist-count">~19 of 149</div>
+        </div>
+      </div>
+
+      <div class="notice">
+        <strong>Class imbalance:</strong> UX dominates the dataset (~82% positive rate), while
+        Technical, Performance, and Data/Security are minority classes. This affects recall on
+        those labels and is the primary driver of lower minority-class F1 scores.
+      </div>
+    </div>
+
+    <!-- Architecture & Training -->
+    <div class="card">
+      <h2>Model Architecture &amp; Training</h2>
+
+      <h3>Pipeline</h3>
+      <div class="pipeline">
+        <div class="pipe-step">Raw Comment<br><span style="font-weight:400;color:#6b7a8d">text string</span></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">Sentence<br>Transformer<br><span style="font-weight:400;color:#6b7a8d">all-MiniLM-L6-v2</span></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">384-dim<br>Embedding<br><span style="font-weight:400;color:#6b7a8d">semantic vector</span></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">4× Logistic<br>Regression<br><span style="font-weight:400;color:#6b7a8d">one per label</span></div>
+        <div class="pipe-arrow">→</div>
+        <div class="pipe-step">Multi-label<br>Prediction<br><span style="font-weight:400;color:#6b7a8d">+ confidence</span></div>
+      </div>
+
+      <h3 style="margin-top:24px">Base Encoder</h3>
+      <p>
+        <code>sentence-transformers/all-MiniLM-L6-v2</code> is used as a frozen feature extractor.
+        It is a 6-layer distilled BERT model (22M parameters) pre-trained on over 1 billion sentence
+        pairs, producing 384-dimensional mean-pooled embeddings. Using a pre-trained encoder avoids
+        the need for large amounts of labeled data to achieve good generalization.
+      </p>
+
+      <h3>Classifier Head</h3>
+      <p>
+        A <code>MultiOutputClassifier</code> wraps four independent
+        <code>LogisticRegression</code> models (L2 regularization, C=1.0, max_iter=1000),
+        one per label. Each outputs a calibrated probability alongside a binary prediction using
+        a 0.5 threshold.
+      </p>
+
+      <h3>Train / Test Split</h3>
+      <p>
+        Data was split 85% / 15% (stratification not applied due to multi-label constraints),
+        yielding <strong>126 training</strong> and <strong>23 test</strong> examples.
+        After evaluation, the final model is retrained on all 149 examples and saved to
+        <code>models/classifier.joblib</code>.
+      </p>
+    </div>
+
+    <!-- Results -->
+    <div class="card">
+      <h2>Test Results</h2>
+      <p style="margin-bottom:16px">
+        Evaluated on 23 held-out comments not seen during training.
+        Metrics are per-label binary classification (positive class = label present).
+      </p>
+
+      <div class="results-grid">
+
+        <div class="result-card">
+          <div class="result-header">
+            Technical
+            <span class="result-accuracy">Accuracy 91%</span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1</th><th>Support</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>No</td><td>0.91</td><td>1.00</td><td class="f1-cell f1-good">0.95</td><td>20</td></tr>
+              <tr><td>Yes</td><td>1.00</td><td>0.33</td><td class="f1-cell f1-mid">0.50</td><td>3</td></tr>
+              <tr><td>Weighted avg</td><td>0.92</td><td>0.91</td><td class="f1-cell">0.89</td><td>23</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="result-card">
+          <div class="result-header">
+            Performance
+            <span class="result-accuracy">Accuracy 91%</span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1</th><th>Support</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>No</td><td>0.91</td><td>1.00</td><td class="f1-cell f1-good">0.95</td><td>21</td></tr>
+              <tr><td>Yes</td><td>0.00</td><td>0.00</td><td class="f1-cell f1-low">0.00</td><td>2</td></tr>
+              <tr><td>Weighted avg</td><td>0.83</td><td>0.91</td><td class="f1-cell">0.87</td><td>23</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="result-card">
+          <div class="result-header">
+            UX
+            <span class="result-accuracy">Accuracy 74%</span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1</th><th>Support</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>No</td><td>0.00</td><td>0.00</td><td class="f1-cell f1-low">0.00</td><td>6</td></tr>
+              <tr><td>Yes</td><td>0.74</td><td>1.00</td><td class="f1-cell f1-good">0.85</td><td>17</td></tr>
+              <tr><td>Weighted avg</td><td>0.55</td><td>0.74</td><td class="f1-cell">0.63</td><td>23</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="result-card">
+          <div class="result-header">
+            Data/Security
+            <span class="result-accuracy">Accuracy 91%</span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>Class</th><th>Precision</th><th>Recall</th><th>F1</th><th>Support</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>No</td><td>0.90</td><td>1.00</td><td class="f1-cell f1-good">0.95</td><td>19</td></tr>
+              <tr><td>Yes</td><td>1.00</td><td>0.50</td><td class="f1-cell f1-mid">0.67</td><td>4</td></tr>
+              <tr><td>Weighted avg</td><td>0.92</td><td>0.91</td><td class="f1-cell">0.90</td><td>23</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Interpretation -->
+    <div class="card">
+      <h2>Interpretation &amp; Limitations</h2>
+
+      <h3>What works well</h3>
+      <ul>
+        <li><strong>UX detection (F1 = 0.85):</strong> The dominant label is identified with perfect recall — all UX comments are caught. The trade-off is low precision on the "No" class, reflecting the model's tendency to over-predict UX.</li>
+        <li><strong>Data/Security precision (1.00):</strong> When the model does predict this label, it is always correct. Terminology in this category (security, compliance, audit, encryption) is semantically distinct and well-separated in embedding space.</li>
+        <li><strong>Technical precision (1.00):</strong> Same story — zero false positives on the minority class.</li>
+      </ul>
+
+      <h3 style="margin-top:20px">Where it struggles</h3>
+      <ul>
+        <li><strong>Performance recall (0.00 on 2 examples):</strong> The test set contained only 2 positive Performance examples — too few to draw strong conclusions. The model errs toward predicting "No" for rare classes.</li>
+        <li><strong>UX "No" recall (0.00):</strong> Because UX is so dominant in training data, the model defaults to predicting UX=Yes for ambiguous inputs.</li>
+        <li><strong>Small test set (n=23):</strong> With 23 held-out examples, individual misclassifications have a large impact on metrics. Results should be interpreted as directional, not definitive.</li>
+      </ul>
+
+      <h3 style="margin-top:20px">Recommendations</h3>
+      <ul>
+        <li><strong>Add more labeled data,</strong> particularly for Technical and Performance categories, to improve minority-class recall.</li>
+        <li><strong>Adjust classification thresholds</strong> per label (e.g., lower the Performance threshold below 0.5) to trade precision for recall on rare classes.</li>
+        <li><strong>Consider SetFit</strong> (few-shot fine-tuning) once more labeled examples are available, to adapt the encoder weights to this domain rather than using it as a frozen extractor.</li>
+        <li><strong>Retrain periodically</strong> as new labeled feedback is collected to keep the model current with evolving application language and user concerns.</li>
+      </ul>
+    </div>
+
+  </main>
+
+</body>
+</html>
