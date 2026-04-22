@@ -29,6 +29,7 @@ class CommentClassifier:
             BASE_MODEL,
             multi_target_strategy="one-vs-rest",
             labels=LABELS,
+            model_init_kwargs={"class_weight": "balanced"},
         )
 
         trainer = Trainer(

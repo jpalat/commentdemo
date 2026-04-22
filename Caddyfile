@@ -1,0 +1,3 @@
+comment.qoeltd.com {
+    reverse_proxy localhost:2273
+}

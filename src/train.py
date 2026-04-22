@@ -29,6 +29,7 @@ def train(csv_path: str = str(DATA_PATH)):
         BASE_MODEL,
         multi_target_strategy="one-vs-rest",
         labels=LABELS,
+        model_init_kwargs={"class_weight": "balanced"},
     )
 
     eval_trainer = Trainer(
